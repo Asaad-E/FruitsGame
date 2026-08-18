@@ -10,10 +10,11 @@ using Microsoft.Xna.Framework.Content;
 using FontStashSharp;
 using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Media;
+using System;
 
 namespace FruitsGame;
 
-public readonly record struct RenderContext(GraphicsDevice GraphicsDevice, SpriteBatch SpriteBatch, ShapeBatch ShapeBatch, ContentManager Content);
+public record struct RenderContext(GraphicsDevice GraphicsDevice, SpriteBatch SpriteBatch, ShapeBatch ShapeBatch, ContentManager Content);
 
 public class FruitsGame : Game
 {
@@ -22,6 +23,7 @@ public class FruitsGame : Game
     private ShapeBatch _shapeBatch;
     private RenderContext _renderContext;
     private ShapeFont _font;
+    private int framescount = 0;
 
     // screen
     public const int VirtualWidth = 1920;
@@ -34,9 +36,18 @@ public class FruitsGame : Game
     private FruitsContainer _fruitsContainer;
     private Song BGMusic;
 
+    private Texture2D dommy;
+
     public FruitsGame()
     {
-        _graphics = new GraphicsDeviceManager(this);
+        _graphics = new GraphicsDeviceManager(this)
+        {
+            PreferredBackBufferWidth = 1280,
+            PreferredBackBufferHeight = 720,
+            GraphicsProfile = GraphicsProfile.HiDef
+        };
+        _graphics.ApplyChanges();
+
         Content.RootDirectory = "Content";
         IsMouseVisible = true;
         IsFixedTimeStep = true;
@@ -46,10 +57,6 @@ public class FruitsGame : Game
     protected override void Initialize()
     {
         // display
-        _graphics.PreferredBackBufferWidth = 1280;
-        _graphics.PreferredBackBufferHeight = 720;
-        _graphics.GraphicsProfile = GraphicsProfile.HiDef;
-        _graphics.ApplyChanges();
 
         base.Initialize();
     }
@@ -57,8 +64,12 @@ public class FruitsGame : Game
     protected override void LoadContent()
     {
         // Batch
-        _spriteBatch = new SpriteBatch(GraphicsDevice);
         _shapeBatch = new ShapeBatch(GraphicsDevice);
+        _shapeBatch.Begin();
+        _shapeBatch.FillRectangle(Vector2.One, Vector2.One, Color.Red);
+        _shapeBatch.End();
+
+        _spriteBatch = new SpriteBatch(GraphicsDevice);
         _renderContext = new RenderContext(GraphicsDevice, _spriteBatch, _shapeBatch, Content);
 
         // initialize viewpoer and camera
@@ -85,10 +96,15 @@ public class FruitsGame : Game
         BGMusic = Content.Load<Song>("SFX/bg");
         SoundEffect.MasterVolume = 1;
         MediaPlayer.IsRepeating = true;
-        MediaPlayer.Volume = 0.4f*0;
+        MediaPlayer.Volume = 0.4f;
         MediaPlayer.Play(BGMusic);
 
-        base.LoadContent();
+
+
+        dommy = new Texture2D(GraphicsDevice, 1, 1);
+        dommy.SetData([Color.Red]);
+
+        Console.WriteLine("assetd loaded");
     }
 
     protected override void Update(GameTime gameTime)
@@ -122,13 +138,17 @@ public class FruitsGame : Game
 
         _fruitsContainer.Update(deltaTime);
 
+        framescount++;
+
         base.Update(gameTime);
     }
 
     protected override void Draw(GameTime gameTime)
     {
+        Console.WriteLine(framescount);
+
         // get current frame
-        var frame = _fruitsContainer.GetFrame(_spriteBatch, _shapeBatch, GraphicsDevice);
+        var frame = _fruitsContainer.GetFrame(_renderContext, GraphicsDevice);
 
         // background        
         GraphicsDevice.Viewport = new Viewport(GraphicsDevice.PresentationParameters.Bounds);
@@ -137,8 +157,10 @@ public class FruitsGame : Game
         GraphicsDevice.Clear(new Color(25, 30, 48));
 
         // TODO: Add your drawing code here
-
         _spriteBatch.Begin(samplerState: SamplerState.AnisotropicWrap, transformMatrix: _camera.GetViewMatrix());
+
+        _shapeBatch.Begin(_camera.GetViewMatrix());
+
 
         _spriteBatch.Draw(
             frame,
@@ -150,7 +172,6 @@ public class FruitsGame : Game
 
         int separation = 40;
         float verticalOffset = _fruitsContainer.VerticalPadding + 50;
-        _shapeBatch.Begin(_camera.GetViewMatrix());
 
 
         _shapeBatch.BeginFillPath(5, Color.White);
@@ -186,7 +207,7 @@ public class FruitsGame : Game
         Vector2 nextPos = new Vector2(_fruitsContainer.Rectangle.Right + separation * 3, _fruitsContainer.VerticalPadding + separation * 3);
         _fruitsContainer.DrawFruit(
             nextPos,
-            80 * (_fruitsContainer.NextFruit + sizeOffet)/(FruitsContainer.MaxFruits + sizeOffet),
+            80 * (_fruitsContainer.NextFruit + sizeOffet) / (FruitsContainer.MaxFruits + sizeOffet),
             _fruitsContainer.NextFruit,
             0
         );

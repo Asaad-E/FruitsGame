@@ -166,7 +166,7 @@ public class FruitsContainer
         // Create fruit and its physical body
         Fruit newFruit = new(value);
         Body fruitBody = _world.CreateCircle(
-            ConvertUnits.ToSim(newFruit.Radius),
+            ConvertUnits.ToSim(newFruit.Radius + 0.5f),
             1f,
             ConvertUnits.ToSim(pos),
             BodyType.Dynamic
@@ -272,13 +272,13 @@ public class FruitsContainer
         }
     }
 
-    public RenderTarget2D GetFrame(SpriteBatch spriteBatch, ShapeBatch shapeBatch, GraphicsDevice graphicsDevice)
+    public RenderTarget2D GetFrame(RenderContext renderContext, GraphicsDevice graphicsDevice)
     {
         graphicsDevice.SetRenderTarget(_frame);
         graphicsDevice.Clear(Color.Transparent);
-        spriteBatch.Begin();
+        renderContext.SpriteBatch.Begin();
         // Player
-        spriteBatch.Draw(
+        renderContext.SpriteBatch.Draw(
             Player.Texture,
             Player.Rectangle,
             null,
@@ -288,9 +288,9 @@ public class FruitsContainer
             SpriteEffects.None,
             0
         );
-        spriteBatch.End();
+        renderContext.SpriteBatch.End();
 
-        shapeBatch.Begin();
+        renderContext.ShapeBatch.Begin();
 
         // Draw a dummy of the next fruit on top on the player
         int radius = Fruit.GetRadiusFromValue(CurrentFruit);
@@ -305,7 +305,7 @@ public class FruitsContainer
         // walls
 
         float margin = 10;
-        shapeBatch.FillLine(
+        renderContext.ShapeBatch.FillLine(
             new Vector2(_wallRectangles[0].Right, _wallRectangles[0].Top + margin),
             new Vector2(_wallRectangles[2].Left, _wallRectangles[2].Top + margin),
             4,
@@ -320,14 +320,14 @@ public class FruitsContainer
 
         for (int i = 0; i < 3; i++)
         {
-            shapeBatch.FillRectangle(
+            renderContext.ShapeBatch.FillRectangle(
                 _wallRectangles[i].Location.ToVector2(),
                 _wallRectangles[i].Size.ToVector2(),
                 wallGradient,
                 10f
             );
         }
-        shapeBatch.FillPath(
+        renderContext.ShapeBatch.FillPath(
             [
                 _wallRectangles[0].Location.ToVector2(),
                 _wallRectangles[0].Location.ToVector2() + Vector2.UnitX * _wallRectangles[0].Width,
@@ -348,7 +348,7 @@ public class FruitsContainer
 
 
 
-        shapeBatch.End();
+        renderContext.ShapeBatch.End();
 
 
         graphicsDevice.SetRenderTarget(null);

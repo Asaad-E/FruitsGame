@@ -1,10 +1,28 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <OutputType>exe</OutputType>
-    <TargetFramework>net9.0</TargetFramework>
+    <OutputType>winexe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
     <RollForward>Major</RollForward>
     <PublishReadyToRun>false</PublishReadyToRun>
     <TieredCompilation>false</TieredCompilation>
+
+    <!-- Single File Packaging -->
+    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+    <PublishSingleFile>true</PublishSingleFile>
+    <SelfContained>true</SelfContained>
+    <PublishReadyToRun>true</PublishReadyToRun>
+    <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
+    <IncludeAllContentForSelfExtract>true</IncludeAllContentForSelfExtract>
+    <DebugType>embedded</DebugType>
+    <SelfContained>true</SelfContained>
+    <EnableCompressionInSingleFile>true</EnableCompressionInSingleFile>
+    <InvariantGlobalization>true</InvariantGlobalization> <!-- Removes ~20 MB of international
+    culture tables -->
+    <DebuggerSupport>false</DebuggerSupport>               <!-- Strips debug hooks -->
+    <EventSourceSupport>false</EventSourceSupport>         <!-- Removes EventSource logging -->
+
+    <!-- Optimization & Symbol Settings -->
+    <OptimizationPreference>Speed</OptimizationPreference>
   </PropertyGroup>
   <PropertyGroup>
     <ApplicationManifest>app.manifest</ApplicationManifest>
