@@ -37,14 +37,12 @@ public class FruitsContainer
 
     // wall
     private Body[] _walls;
-    private int _WallThick = 60;
-    private Color _wallColor = new(222, 206, 195);
+    private const int _WallThick = 60;
     public Rectangle[] _wallRectangles = new Rectangle[3];
 
     // Player
     public Player Player;
     public int Points = 0;
-
     public int CurrentFruit;
     public int NextFruit;
     public int MinFruitRange = 0;
@@ -53,6 +51,8 @@ public class FruitsContainer
     // Fruits
     public List<Fruit> Fruits;
     public const int MaxFruits = 11;
+
+    public int[] PrecomputedRadius;
 
     public SoundEffect[] FusionSonds = new SoundEffect[MaxFruits];
     public SoundEffect DropSound;
@@ -102,6 +102,13 @@ public class FruitsContainer
         BoxWidth = rect.Width - HorizontalPadding * 2;
         BoxHeight = rect.Height - verticalPadding;
 
+        // Radius
+        PrecomputedRadius = new int[MaxFruits];
+        for (int i = 0; i < MaxFruits; i++)
+        {
+            PrecomputedRadius[i] = Fruit.GetRadiusFromValue(i);
+        }
+
         // initialize physic engine
         _world = new(new Vector2(0, 9.8f));
         _world.ContactManager.BeginContact += OnFruitCollision;
@@ -124,9 +131,17 @@ public class FruitsContainer
         {
             FusionSonds[i] = _renderContext.Content.Load<SoundEffect>($"SFX/pop{i}");
         }
+
         DropSound = _renderContext.Content.Load<SoundEffect>("SFX/click");
+
         // load textures
         _frame = new RenderTarget2D(_renderContext.GraphicsDevice, rect.Width, rect.Height, false, SurfaceFormat.Color, DepthFormat.None, 4, RenderTargetUsage.DiscardContents);
+    
+        // crate color
+        WallGradient = new(
+            new Vector2(0, 0), new Color(96, 165, 250),
+            new Vector2(0, Rectangle.Bottom), new Color(160, 100, 250)
+        );
     }
 
     public void CreateBoxBorders()
@@ -161,7 +176,7 @@ public class FruitsContainer
 
     }
 
-    public Fruit CreateFruit(Vector2 pos, int value = 1)
+    public Fruit CreateFruit(Vector2 pos, int value = 0)
     {
         // Create fruit and its physical body
         Fruit newFruit = new(value);
@@ -191,6 +206,7 @@ public class FruitsContainer
     {
         CurrentFruit = 0;
         NextFruit = GetRandomFruit();
+        MaxFruitsRange = 3;
         Points = 0;
         Player.Position.X = Rectangle.Width / 2;
 
@@ -199,6 +215,8 @@ public class FruitsContainer
             _world.Remove(Fruits[i].Body);
         }
 
+        _creationQueue.Clear();
+        _deleteQueue.Clear();
         Fruits.Clear();
     }
 
@@ -212,6 +230,9 @@ public class FruitsContainer
         // Check player timer
         if (Player.DropTimer != 0) return;
 
+        // play sound
+        DropSound.Play(0.4f, 0, 0);
+
         // Drop the fruit
         Fruit newFruit = CreateFruit(Player.PointOfRelease.ToVector2(), CurrentFruit);
         newFruit.Body.Rotation = 0;
@@ -222,8 +243,6 @@ public class FruitsContainer
 
         NextFruit = GetRandomFruit();
 
-        // play sound
-        DropSound.Play(0.9f, 0, 0);
         Player.SetCooldown();
     }
 
@@ -272,13 +291,14 @@ public class FruitsContainer
         }
     }
 
-    public RenderTarget2D GetFrame(RenderContext renderContext, GraphicsDevice graphicsDevice)
+    public RenderTarget2D GetFrame()
     {
-        graphicsDevice.SetRenderTarget(_frame);
-        graphicsDevice.Clear(Color.Transparent);
-        renderContext.SpriteBatch.Begin();
+        _renderContext.GraphicsDevice.SetRenderTarget(_frame);
+        _renderContext.GraphicsDevice.Clear(Color.Transparent);
+
         // Player
-        renderContext.SpriteBatch.Draw(
+        _renderContext.SpriteBatch.Begin();
+        _renderContext.SpriteBatch.Draw(
             Player.Texture,
             Player.Rectangle,
             null,
@@ -288,13 +308,12 @@ public class FruitsContainer
             SpriteEffects.None,
             0
         );
-        renderContext.SpriteBatch.End();
+        _renderContext.SpriteBatch.End();
 
-        renderContext.ShapeBatch.Begin();
+        _renderContext.ShapeBatch.Begin();
 
         // Draw a dummy of the next fruit on top on the player
-        int radius = Fruit.GetRadiusFromValue(CurrentFruit);
-        DrawFruit(Player.PointOfRelease.ToVector2(), radius, CurrentFruit);
+        DrawFruit(Player.PointOfRelease.ToVector2(), PrecomputedRadius[CurrentFruit], CurrentFruit);
 
         // fruits
         foreach (var fruit in Fruits)
@@ -303,31 +322,44 @@ public class FruitsContainer
         }
 
         // walls
+        DrawWalls();
 
-        float margin = 10;
-        renderContext.ShapeBatch.FillLine(
-            new Vector2(_wallRectangles[0].Right, _wallRectangles[0].Top + margin),
-            new Vector2(_wallRectangles[2].Left, _wallRectangles[2].Top + margin),
+        // Close batch
+        _renderContext.ShapeBatch.End();
+        
+        // Change the target to the screen
+        _renderContext.GraphicsDevice.SetRenderTarget(null);
+
+        return _frame;
+    }
+
+    public const int WallMargin = 10;
+    public const int WallBorderSize = 2;
+    public Gradient WallGradient;
+    public void DrawWalls()
+    {
+        // Limit line
+        _renderContext.ShapeBatch.FillLine(
+            new Vector2(_wallRectangles[0].Right, _wallRectangles[0].Top + WallMargin),
+            new Vector2(_wallRectangles[2].Left, _wallRectangles[2].Top + WallMargin),
             4,
             new Color(245, 245, 245, 150),
             dash: new DashStyle(15, 10, 0.5f)
         );
 
-        Gradient wallGradient = new(
-            new Vector2(0, 0), new Color(96, 165, 250),
-            new Vector2(0, Rectangle.Bottom), new Color(160, 100, 250)
-        );
-
+        // Walls
         for (int i = 0; i < 3; i++)
         {
-            renderContext.ShapeBatch.FillRectangle(
+            _renderContext.ShapeBatch.FillRectangle(
                 _wallRectangles[i].Location.ToVector2(),
                 _wallRectangles[i].Size.ToVector2(),
-                wallGradient,
+                WallGradient,
                 10f
             );
         }
-        renderContext.ShapeBatch.FillPath(
+
+        // Wall border
+        _renderContext.ShapeBatch.FillPath(
             [
                 _wallRectangles[0].Location.ToVector2(),
                 _wallRectangles[0].Location.ToVector2() + Vector2.UnitX * _wallRectangles[0].Width,
@@ -338,21 +370,13 @@ public class FruitsContainer
                 new Vector2(_wallRectangles[2].Right, _wallRectangles[2].Bottom),
                 new Vector2(_wallRectangles[0].Left, _wallRectangles[0].Bottom)
             ],
-            2,
+            WallBorderSize,
             new Color(235, 240, 248),
             PathJoin.Round,
             PathCap.Round,
             null,
             closed: true
         );
-
-
-
-        renderContext.ShapeBatch.End();
-
-
-        graphicsDevice.SetRenderTarget(null);
-        return _frame;
     }
 
     public void DrawFruit(Vector2 pos, int radius, int value, float rotation = 0)

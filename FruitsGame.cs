@@ -36,8 +36,6 @@ public class FruitsGame : Game
     private FruitsContainer _fruitsContainer;
     private Song BGMusic;
 
-    private Texture2D dommy;
-
     public FruitsGame()
     {
         _graphics = new GraphicsDeviceManager(this)
@@ -96,15 +94,8 @@ public class FruitsGame : Game
         BGMusic = Content.Load<Song>("SFX/bg");
         SoundEffect.MasterVolume = 1;
         MediaPlayer.IsRepeating = true;
-        MediaPlayer.Volume = 0.4f;
+        MediaPlayer.Volume = 0.4f * 0;
         MediaPlayer.Play(BGMusic);
-
-
-
-        dommy = new Texture2D(GraphicsDevice, 1, 1);
-        dommy.SetData([Color.Red]);
-
-        Console.WriteLine("assetd loaded");
     }
 
     protected override void Update(GameTime gameTime)
@@ -148,7 +139,7 @@ public class FruitsGame : Game
         Console.WriteLine(framescount);
 
         // get current frame
-        var frame = _fruitsContainer.GetFrame(_renderContext, GraphicsDevice);
+        var frame = _fruitsContainer.GetFrame();
 
         // background        
         GraphicsDevice.Viewport = new Viewport(GraphicsDevice.PresentationParameters.Bounds);
@@ -169,42 +160,11 @@ public class FruitsGame : Game
         );
 
         // draw guide
-
-        int separation = 40;
-        float verticalOffset = _fruitsContainer.VerticalPadding + 50;
-
-
-        _shapeBatch.BeginFillPath(5, Color.White);
-        _shapeBatch.PathTo(new Vector2(_fruitsContainer.Rectangle.Left - separation, verticalOffset));
-        int triangleSize = 10;
-        Vector2 lastPoint = new(_fruitsContainer.Rectangle.Left - separation, verticalOffset + 630);
-        _shapeBatch.PathTo(lastPoint);
-        _shapeBatch.EndPath();
-
-        _shapeBatch.FillTriangle(
-            lastPoint - Vector2.UnitX * triangleSize,
-            lastPoint + Vector2.UnitX * triangleSize,
-            lastPoint + Vector2.UnitY * triangleSize * 2,
-            Color.White
-        );
-        for (int i = 0; i < FruitsContainer.MaxFruits; i++)
-        {
-            int offset = 10;
-            int radius = 30 * (i + offset) / (FruitsContainer.MaxFruits + offset);
-            verticalOffset += radius * 2.5f;
-
-            _fruitsContainer.DrawFruit(
-                new Vector2(_fruitsContainer.Rectangle.Left - separation, verticalOffset),
-                radius,
-                i,
-                0
-            );
-        }
-
+        DrawGuide(new Vector2(_fruitsContainer.Rectangle.Left - Separation, _fruitsContainer.VerticalPadding + Separation));
 
         // draw next
         int sizeOffet = 4;
-        Vector2 nextPos = new Vector2(_fruitsContainer.Rectangle.Right + separation * 3, _fruitsContainer.VerticalPadding + separation * 3);
+        Vector2 nextPos = new(_fruitsContainer.Rectangle.Right + Separation * 3, _fruitsContainer.VerticalPadding + Separation * 3);
         _fruitsContainer.DrawFruit(
             nextPos,
             80 * (_fruitsContainer.NextFruit + sizeOffet) / (FruitsContainer.MaxFruits + sizeOffet),
@@ -224,5 +184,48 @@ public class FruitsGame : Game
         _spriteBatch.End();
 
         base.Draw(gameTime);
+    }
+
+    public const int Separation = 40;
+    public const int TriangleSize = 10;
+    public const int RadiusOffset = 8;
+    public const int RadiusGuide = 35;
+    public int CustomRadius(int i) => RadiusGuide * (i + RadiusOffset) / (FruitsContainer.MaxFruits + RadiusOffset);
+
+    public void DrawGuide(Vector2 pos)
+    {
+        _shapeBatch.BeginFillPath(5, Color.White);
+        _shapeBatch.PathTo(pos);
+
+        float acumulator = Separation;
+        for (int i = 0; i < FruitsContainer.MaxFruits; i++)
+        {
+            acumulator += CustomRadius(i) * 2.5f;
+        }
+        acumulator += Separation / 2;
+        Vector2 lastPoint = pos + Vector2.UnitY * acumulator;
+        _shapeBatch.PathTo(lastPoint);
+        _shapeBatch.EndPath();
+
+        _shapeBatch.FillTriangle(
+            lastPoint - Vector2.UnitX * TriangleSize,
+            lastPoint + Vector2.UnitX * TriangleSize,
+            lastPoint + Vector2.UnitY * TriangleSize * 2,
+            Color.White
+        );
+
+        float verticalOffset = pos.Y;
+        for (int i = 0; i < FruitsContainer.MaxFruits; i++)
+        {
+            int radius = CustomRadius(i);
+            verticalOffset += radius * 2.5f;
+
+            _fruitsContainer.DrawFruit(
+                new Vector2(_fruitsContainer.Rectangle.Left - Separation, verticalOffset),
+                radius,
+                i,
+                0
+            );
+        }
     }
 }
