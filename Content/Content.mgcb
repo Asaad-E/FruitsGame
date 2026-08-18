@@ -13,52 +13,16 @@
 
 #---------------------------------- Content ---------------------------------#
 
-#begin File.spritefont
+#begin font.spritefont
 /importer:FontDescriptionImporter
 /processor:FontDescriptionProcessor
 /processorParam:PremultiplyAlpha=True
 /processorParam:TextureFormat=Compressed
 /processorParam:Version=3.8.5.0
-/build:File.spritefont;DiagnosticsFont.spritefont
+/build:font.spritefont;DefaultFont.spritefont
 
-#begin Images/bg.png
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyColor=255,0,255,255
-/processorParam:ColorKeyEnabled=True
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/processorParam:Version=3.8.5.0
-/build:Images/bg.png
-
-#begin Images/block.png
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyColor=255,0,255,255
-/processorParam:ColorKeyEnabled=True
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/processorParam:Version=3.8.5.0
-/build:Images/block.png
-
-#begin Images/btn-start.png
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyColor=255,0,255,255
-/processorParam:ColorKeyEnabled=True
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/processorParam:Version=3.8.5.0
-/build:Images/btn-start.png
+#begin font.ttf
+/copy:font.ttf
 
 #begin Images/cloud.png
 /importer:TextureImporter
@@ -73,149 +37,6 @@
 /processorParam:Version=3.8.5.0
 /build:Images/cloud.png
 
-#begin Images/Fruits/circle0.png
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyColor=255,0,255,255
-/processorParam:ColorKeyEnabled=True
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/processorParam:Version=3.8.5.0
-/build:Images/Fruits/circle0.png
-
-#begin Images/Fruits/circle1.png
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyColor=255,0,255,255
-/processorParam:ColorKeyEnabled=True
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/processorParam:Version=3.8.5.0
-/build:Images/Fruits/circle1.png
-
-#begin Images/Fruits/circle10.png
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyColor=255,0,255,255
-/processorParam:ColorKeyEnabled=True
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/processorParam:Version=3.8.5.0
-/build:Images/Fruits/circle10.png
-
-#begin Images/Fruits/circle2.png
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyColor=255,0,255,255
-/processorParam:ColorKeyEnabled=True
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/processorParam:Version=3.8.5.0
-/build:Images/Fruits/circle2.png
-
-#begin Images/Fruits/circle3.png
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyColor=255,0,255,255
-/processorParam:ColorKeyEnabled=True
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/processorParam:Version=3.8.5.0
-/build:Images/Fruits/circle3.png
-
-#begin Images/Fruits/circle4.png
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyColor=255,0,255,255
-/processorParam:ColorKeyEnabled=True
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/processorParam:Version=3.8.5.0
-/build:Images/Fruits/circle4.png
-
-#begin Images/Fruits/circle5.png
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyColor=255,0,255,255
-/processorParam:ColorKeyEnabled=True
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/processorParam:Version=3.8.5.0
-/build:Images/Fruits/circle5.png
-
-#begin Images/Fruits/circle6.png
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyColor=255,0,255,255
-/processorParam:ColorKeyEnabled=True
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/processorParam:Version=3.8.5.0
-/build:Images/Fruits/circle6.png
-
-#begin Images/Fruits/circle7.png
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyColor=255,0,255,255
-/processorParam:ColorKeyEnabled=True
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/processorParam:Version=3.8.5.0
-/build:Images/Fruits/circle7.png
-
-#begin Images/Fruits/circle8.png
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyColor=255,0,255,255
-/processorParam:ColorKeyEnabled=True
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/processorParam:Version=3.8.5.0
-/build:Images/Fruits/circle8.png
-
-#begin Images/Fruits/circle9.png
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyColor=255,0,255,255
-/processorParam:ColorKeyEnabled=True
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/processorParam:Version=3.8.5.0
-/build:Images/Fruits/circle9.png
-
 #begin Images/pop.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -229,87 +50,94 @@
 /processorParam:Version=3.8.5.0
 /build:Images/pop.png
 
-#begin Music/click.mp3
+#begin SFX/bg.mp3
 /importer:Mp3Importer
 /processor:SongProcessor
 /processorParam:Quality=Best
 /processorParam:Version=3.8.5.0
-/build:Music/click.mp3
+/build:SFX/bg.mp3
 
-#begin Music/pop0.mp3
-/importer:Mp3Importer
-/processor:SongProcessor
+#begin SFX/click.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
 /processorParam:Quality=Best
 /processorParam:Version=3.8.5.0
-/build:Music/pop0.mp3
+/build:SFX/click.wav
 
-#begin Music/pop1.mp3
-/importer:Mp3Importer
-/processor:SongProcessor
+#begin SFX/pop0.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
 /processorParam:Quality=Best
 /processorParam:Version=3.8.5.0
-/build:Music/pop1.mp3
+/build:SFX/pop0.wav
 
-#begin Music/pop10.mp3
-/importer:Mp3Importer
-/processor:SongProcessor
+#begin SFX/pop1.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
 /processorParam:Quality=Best
 /processorParam:Version=3.8.5.0
-/build:Music/pop10.mp3
+/build:SFX/pop1.wav
 
-#begin Music/pop2.mp3
-/importer:Mp3Importer
-/processor:SongProcessor
+#begin SFX/pop10.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
 /processorParam:Quality=Best
 /processorParam:Version=3.8.5.0
-/build:Music/pop2.mp3
+/build:SFX/pop10.wav
 
-#begin Music/pop3.mp3
-/importer:Mp3Importer
-/processor:SongProcessor
+#begin SFX/pop2.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
 /processorParam:Quality=Best
 /processorParam:Version=3.8.5.0
-/build:Music/pop3.mp3
+/build:SFX/pop2.wav
 
-#begin Music/pop4.mp3
-/importer:Mp3Importer
-/processor:SongProcessor
+#begin SFX/pop3.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
 /processorParam:Quality=Best
 /processorParam:Version=3.8.5.0
-/build:Music/pop4.mp3
+/build:SFX/pop3.wav
 
-#begin Music/pop5.mp3
-/importer:Mp3Importer
-/processor:SongProcessor
+#begin SFX/pop4.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
 /processorParam:Quality=Best
 /processorParam:Version=3.8.5.0
-/build:Music/pop5.mp3
+/build:SFX/pop4.wav
 
-#begin Music/pop6.mp3
-/importer:Mp3Importer
-/processor:SongProcessor
+#begin SFX/pop5.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
 /processorParam:Quality=Best
 /processorParam:Version=3.8.5.0
-/build:Music/pop6.mp3
+/build:SFX/pop5.wav
 
-#begin Music/pop7.mp3
-/importer:Mp3Importer
-/processor:SongProcessor
+#begin SFX/pop6.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
 /processorParam:Quality=Best
 /processorParam:Version=3.8.5.0
-/build:Music/pop7.mp3
+/build:SFX/pop6.wav
 
-#begin Music/pop8.mp3
-/importer:Mp3Importer
-/processor:SongProcessor
+#begin SFX/pop7.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
 /processorParam:Quality=Best
 /processorParam:Version=3.8.5.0
-/build:Music/pop8.mp3
+/build:SFX/pop7.wav
 
-#begin Music/pop9.mp3
-/importer:Mp3Importer
-/processor:SongProcessor
+#begin SFX/pop8.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
 /processorParam:Quality=Best
 /processorParam:Version=3.8.5.0
-/build:Music/pop9.mp3
+/build:SFX/pop8.wav
+
+#begin SFX/pop9.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/processorParam:Version=3.8.5.0
+/build:SFX/pop9.wav
 

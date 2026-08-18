@@ -1,17 +1,10 @@
 using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Xml;
-using System.Xml.Linq;
+using Apos.Shapes;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Content;
+using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
-using MonoGame.Extended;
-using MonoGame.Extended.ViewportAdapters;
-using nkast.Aether.Physics2D.Collision.Shapes;
 using nkast.Aether.Physics2D.Common;
-using nkast.Aether.Physics2D.Diagnostics;
 using nkast.Aether.Physics2D.Dynamics;
 using nkast.Aether.Physics2D.Dynamics.Contacts;
 
@@ -29,8 +22,10 @@ public class FruitsContainer
     public float BoxHeight;
     public int HorizontalPadding;
     public int VerticalPadding;
+
+    // drawing
     public RenderTarget2D _frame;
-    public GraphicsDevice GraphicsDevice;
+    private RenderContext _renderContext;
 
     // Physic simulation
     private readonly World _world;
@@ -42,13 +37,13 @@ public class FruitsContainer
 
     // wall
     private Body[] _walls;
-    private int _WallThick = 20;
-    private Texture2D _wallTexture;
+    private int _WallThick = 60;
     private Color _wallColor = new(222, 206, 195);
     public Rectangle[] _wallRectangles = new Rectangle[3];
 
     // Player
     public Player Player;
+    public int Points = 0;
 
     public int CurrentFruit;
     public int NextFruit;
@@ -58,17 +53,53 @@ public class FruitsContainer
     // Fruits
     public List<Fruit> Fruits;
     public const int MaxFruits = 11;
-    private readonly Texture2D[] _fruitTextures = new Texture2D[MaxFruits];
 
-    public FruitsContainer(Rectangle rect, int horizontalPadding, int verticalPadding, GraphicsDevice graphicsDevice, ContentManager content)
+    public SoundEffect[] FusionSonds = new SoundEffect[MaxFruits];
+    public SoundEffect DropSound;
+
+    public static readonly Color[] InnerColors =
+    [
+        new Color(255, 120, 140), // 1. Cherry
+        new Color(255, 190, 210), // 2. Strawberry
+        new Color(130, 180, 255), // 3. Grape
+        new Color(255, 210, 100), // 4. Dekopon
+        new Color(255, 180,  80), // 5. Persimmon
+        new Color(230, 100, 210), // 6. Apple
+        new Color(255, 255, 180), // 7. Pear
+        new Color(255, 220, 225), // 8. Peach
+        new Color(255, 240, 130), // 9. Pineapple
+        new Color(156, 219, 200), // 10. Melon
+        new Color( 90, 230,  90)  // 11. Watermelon
+    ];
+
+    // Outer edge base colors
+    public static readonly Color[] OuterColors =
+    [
+        new Color(215,  20,  45), // 1. Cherry
+        new Color(255,  80, 110), // 2. Strawberry
+        new Color( 30,  90, 220), // 3. Grape
+        new Color(245, 130,  15), // 4. Dekopon
+        new Color(235,  80,  15), // 5. Persimmon
+        new Color(160,  30, 130), // 6. Apple
+        new Color(215, 200,  70), // 7. Pear
+        new Color(250, 150, 165), // 8. Peach
+        new Color(245, 175,  15), // 9. Pineapple
+        new Color( 12, 100, 123), // 10. Melon
+        new Color( 10, 120,  40)  // 11. Watermelon
+    ];
+
+    public FruitsContainer(Rectangle rect, int horizontalPadding, int verticalPadding, RenderContext renderContext)
     {
+        // drawing
+        _renderContext = renderContext;
+
         // Create container of the game
         Rectangle = rect;
 
-        HorizontalPadding = horizontalPadding;
+        HorizontalPadding = Math.Max(horizontalPadding, 5);
         VerticalPadding = verticalPadding;
 
-        BoxWidth = rect.Width - horizontalPadding * 2;
+        BoxWidth = rect.Width - HorizontalPadding * 2;
         BoxHeight = rect.Height - verticalPadding;
 
         // initialize physic engine
@@ -84,20 +115,18 @@ public class FruitsContainer
         // load player
         Player = new(
             postion: new Vector2(Rectangle.Width / 2, verticalPadding / 2),
-            content
+            _renderContext.Content
         );
 
-        // load textures
-        _frame = new(graphicsDevice, rect.Width, rect.Height);
-
-        _wallTexture = new Texture2D(graphicsDevice, 1, 1);
-        _wallTexture.SetData([Color.White]);
-
+        // load sound effects
 
         for (int i = 0; i < MaxFruits; i++)
         {
-            _fruitTextures[i] = content.Load<Texture2D>($"Images/Fruits/circle{i}");
+            FusionSonds[i] = _renderContext.Content.Load<SoundEffect>($"SFX/pop{i}");
         }
+        DropSound = _renderContext.Content.Load<SoundEffect>("SFX/click");
+        // load textures
+        _frame = new RenderTarget2D(_renderContext.GraphicsDevice, rect.Width, rect.Height, false, SurfaceFormat.Color, DepthFormat.None, 4, RenderTargetUsage.DiscardContents);
     }
 
     public void CreateBoxBorders()
@@ -105,10 +134,10 @@ public class FruitsContainer
         // walls
         _walls = new Body[3];
 
-        // floor, rigth, left 
-        _wallRectangles[0] = new Rectangle((int)HorizontalPadding, (int)Rectangle.Height - _WallThick, (int)BoxWidth, _WallThick);
-        _wallRectangles[1] = new Rectangle(Rectangle.Width - _WallThick - (int)HorizontalPadding, (int)VerticalPadding, _WallThick, (int)BoxHeight);
-        _wallRectangles[2] = new Rectangle((int)HorizontalPadding, (int)VerticalPadding, _WallThick, (int)BoxHeight);
+        // left, rigth, floor,  
+        _wallRectangles[0] = new Rectangle((int)HorizontalPadding, (int)VerticalPadding, _WallThick, (int)BoxHeight);
+        _wallRectangles[1] = new Rectangle((int)HorizontalPadding, (int)Rectangle.Height - _WallThick, (int)BoxWidth, _WallThick);
+        _wallRectangles[2] = new Rectangle(Rectangle.Width - _WallThick - (int)HorizontalPadding, (int)VerticalPadding, _WallThick, (int)BoxHeight);
 
         for (int i = 0; i < 3; i++)
         {
@@ -135,7 +164,7 @@ public class FruitsContainer
     public Fruit CreateFruit(Vector2 pos, int value = 1)
     {
         // Create fruit and its physical body
-        Fruit newFruit = new(value, _fruitTextures[value]);
+        Fruit newFruit = new(value);
         Body fruitBody = _world.CreateCircle(
             ConvertUnits.ToSim(newFruit.Radius),
             1f,
@@ -162,6 +191,15 @@ public class FruitsContainer
     {
         CurrentFruit = 0;
         NextFruit = GetRandomFruit();
+        Points = 0;
+        Player.Position.X = Rectangle.Width / 2;
+
+        for (int i = 0; i < Fruits.Count; i++)
+        {
+            _world.Remove(Fruits[i].Body);
+        }
+
+        Fruits.Clear();
     }
 
     public int GetRandomFruit()
@@ -171,6 +209,9 @@ public class FruitsContainer
 
     public void DropFruit()
     {
+        // Check player timer
+        if (Player.DropTimer != 0) return;
+
         // Drop the fruit
         Fruit newFruit = CreateFruit(Player.PointOfRelease.ToVector2(), CurrentFruit);
         newFruit.Body.Rotation = 0;
@@ -181,6 +222,9 @@ public class FruitsContainer
 
         NextFruit = GetRandomFruit();
 
+        // play sound
+        DropSound.Play(0.9f, 0, 0);
+        Player.SetCooldown();
     }
 
     public void Update(float deltaTime)
@@ -190,9 +234,12 @@ public class FruitsContainer
         {
             foreach (Fruit fruit in _deleteQueue)
             {
-                Fruits.Remove(fruit);
-                _world.Remove(fruit.Body);
-
+                try
+                {
+                    Fruits.Remove(fruit);
+                    _world.Remove(fruit.Body);
+                }
+                catch { }
             }
             _deleteQueue.Clear();
         }
@@ -212,14 +259,24 @@ public class FruitsContainer
 
         // update world
         _world.Step(deltaTime);
+
+        // CHECK IF OVERFLOW
+
+        for (int i = 0; i < Fruits.Count; i++)
+        {
+            if (Fruits[i].Position.Y + Fruits[i].Radius < VerticalPadding)
+            {
+                Initialize();
+                break;
+            }
+        }
     }
 
-    public RenderTarget2D GetFrame(SpriteBatch spriteBatch, GraphicsDevice graphicsDevice)
+    public RenderTarget2D GetFrame(SpriteBatch spriteBatch, ShapeBatch shapeBatch, GraphicsDevice graphicsDevice)
     {
         graphicsDevice.SetRenderTarget(_frame);
         graphicsDevice.Clear(Color.Transparent);
         spriteBatch.Begin();
-
         // Player
         spriteBatch.Draw(
             Player.Texture,
@@ -231,53 +288,89 @@ public class FruitsContainer
             SpriteEffects.None,
             0
         );
+        spriteBatch.End();
+
+        shapeBatch.Begin();
 
         // Draw a dummy of the next fruit on top on the player
-        spriteBatch.Draw(
-                    _fruitTextures[CurrentFruit],
-                    new Rectangle(
-                        Player.PointOfRelease,
-                        new Point(
-                            Fruit.GetRadiusFromValue(CurrentFruit) * 2,
-                            Fruit.GetRadiusFromValue(CurrentFruit) * 2)
-                    ),
-                    null,
-                    Color.White,
-                    0,
-                    new Vector2(
-                            _fruitTextures[CurrentFruit].Width / 2,
-                            _fruitTextures[CurrentFruit].Height / 2),
-                    SpriteEffects.None,
-                    0
-                );
+        int radius = Fruit.GetRadiusFromValue(CurrentFruit);
+        DrawFruit(Player.PointOfRelease.ToVector2(), radius, CurrentFruit);
 
         // fruits
         foreach (var fruit in Fruits)
         {
-            spriteBatch.Draw(
-                fruit.Texture,
-                fruit.Rectangle,
-                null,
-                Color.White,
-                fruit.Body.Rotation,
-                fruit.Origin,
-                SpriteEffects.None,
-                1f
-            );
+            DrawFruit(fruit.Position.ToVector2(), fruit.Radius, fruit.Value, fruit.Body.Rotation);
         }
 
         // walls
+
+        float margin = 10;
+        shapeBatch.FillLine(
+            new Vector2(_wallRectangles[0].Right, _wallRectangles[0].Top + margin),
+            new Vector2(_wallRectangles[2].Left, _wallRectangles[2].Top + margin),
+            4,
+            new Color(245, 245, 245, 150),
+            dash: new DashStyle(15, 10, 0.5f)
+        );
+
+        Gradient wallGradient = new(
+            new Vector2(0, 0), new Color(96, 165, 250),
+            new Vector2(0, Rectangle.Bottom), new Color(160, 100, 250)
+        );
+
         for (int i = 0; i < 3; i++)
         {
-            spriteBatch.Draw(
-            _wallTexture,
-            _wallRectangles[i],
-            _wallColor);
+            shapeBatch.FillRectangle(
+                _wallRectangles[i].Location.ToVector2(),
+                _wallRectangles[i].Size.ToVector2(),
+                wallGradient,
+                10f
+            );
         }
+        shapeBatch.FillPath(
+            [
+                _wallRectangles[0].Location.ToVector2(),
+                _wallRectangles[0].Location.ToVector2() + Vector2.UnitX * _wallRectangles[0].Width,
+                _wallRectangles[1].Location.ToVector2() + Vector2.UnitX * _wallRectangles[0].Width,
+                _wallRectangles[1].Location.ToVector2() + Vector2.UnitX * _wallRectangles[1].Width - Vector2.UnitX * _wallRectangles[2].Width,
+                _wallRectangles[2].Location.ToVector2(),
+                _wallRectangles[2].Location.ToVector2() + Vector2.UnitX * _wallRectangles[2].Width,
+                new Vector2(_wallRectangles[2].Right, _wallRectangles[2].Bottom),
+                new Vector2(_wallRectangles[0].Left, _wallRectangles[0].Bottom)
+            ],
+            2,
+            new Color(235, 240, 248),
+            PathJoin.Round,
+            PathCap.Round,
+            null,
+            closed: true
+        );
 
-        spriteBatch.End();
+
+
+        shapeBatch.End();
+
+
         graphicsDevice.SetRenderTarget(null);
         return _frame;
+    }
+
+    public void DrawFruit(Vector2 pos, int radius, int value, float rotation = 0)
+    {
+        _renderContext.ShapeBatch.DrawCircle(
+                pos,
+                radius,
+                new Gradient(
+                    new Vector2(-radius, -radius), InnerColors[value],
+                    new Vector2(radius, radius), OuterColors[value],
+                    isLocal: true,
+                    s: Gradient.Shape.Linear,
+                    bOffset: radius * 0.2f
+                ),
+                new Color(235, 240, 248),
+                thickness: radius * 0.05f,
+                rotation: rotation
+            );
     }
 
     public bool OnFruitCollision(Contact contact)
@@ -308,6 +401,20 @@ public class FruitsContainer
 
             int newValue = Math.Clamp(fruitA.Value + 1, 0, MaxFruits - 1);
 
+            Points += (fruitA.Value + 2) * (fruitA.Value + 1) / 2;
+
+            // play sound
+            FusionSonds[fruitA.Value].Play();
+
+            // Do not create a new fruit when you get to the last one
+            if (fruitA.Value == MaxFruits - 1) return false;
+
+            if (fruitA.Value > MaxFruitsRange)
+            {
+                MaxFruitsRange = Math.Max(fruitA.Value, MaxFruits - 4);
+            }
+
+            // create a new fruit with one value more
             _creationQueue.Add(
                 () =>
                 {
@@ -333,5 +440,15 @@ public class FruitsContainer
     public void MovePlayer(int direction)
     {
         Player.Direction += direction;
+
+        int margin = -5;
+        if (Player.Position.X - Player.Size.X / 2 + margin < HorizontalPadding)
+        {
+            Player.Position.X = Player.Size.X / 2 + HorizontalPadding - margin;
+        }
+        if (Player.Position.X + Player.Size.X / 2 - margin > BoxWidth + HorizontalPadding)
+        {
+            Player.Position.X = BoxWidth + HorizontalPadding - Player.Size.X / 2 + margin;
+        }
     }
 }
