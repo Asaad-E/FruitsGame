@@ -222,7 +222,9 @@ public class FruitsContainer
 
     public int GetRandomFruit()
     {
-        return Random.Shared.Next(MinFruitRange, MaxFruitsRange);
+        int a = Random.Shared.Next(MinFruitRange, MaxFruitsRange);
+        int b = Random.Shared.Next(MinFruitRange, MaxFruitsRange);
+        return Math.Min(a, b);
     }
 
     public void DropFruit()
@@ -435,7 +437,7 @@ public class FruitsContainer
 
             if (fruitA.Value > MaxFruitsRange)
             {
-                MaxFruitsRange = Math.Max(fruitA.Value, MaxFruits - 4);
+                MaxFruitsRange = Math.Min(fruitA.Value + 1, MaxFruits - 4);
             }
 
             // create a new fruit with one value more
