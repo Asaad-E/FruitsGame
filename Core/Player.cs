@@ -19,9 +19,9 @@ public class Player
     public float Speed = 350;
     public int Direction = 0; // Direction of movvemnt that frame, after move reset to 0
 
-    public Player(Vector2 postion, ContentManager content)
+    public Player(Vector2 position, ContentManager content)
     {
-        Position = postion;
+        Position = position;
         Texture = content.Load<Texture2D>("Images/cloud");
 
         Origin = new(Texture.Width / 2, Texture.Height / 2);

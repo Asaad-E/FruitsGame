@@ -27,7 +27,7 @@ public class FruitsContainer
     public RenderTarget2D _frame;
     private RenderContext _renderContext;
 
-    // Physic simulation
+    // Physics simulation
     private readonly World _world;
     private const float _globalRestitution = 0.3f;
     private const float _globalFriction = 0.9f;
@@ -54,7 +54,7 @@ public class FruitsContainer
 
     public int[] PrecomputedRadius;
 
-    public SoundEffect[] FusionSonds = new SoundEffect[MaxFruits];
+    public SoundEffect[] FusionSounds = new SoundEffect[MaxFruits];
     public SoundEffect DropSound;
 
     public static readonly Color[] InnerColors =
@@ -121,7 +121,7 @@ public class FruitsContainer
 
         // load player
         Player = new(
-            postion: new Vector2(Rectangle.Width / 2, verticalPadding / 2),
+            position: new Vector2(Rectangle.Width / 2, verticalPadding / 2),
             _renderContext.Content
         );
 
@@ -129,7 +129,7 @@ public class FruitsContainer
 
         for (int i = 0; i < MaxFruits; i++)
         {
-            FusionSonds[i] = _renderContext.Content.Load<SoundEffect>($"SFX/pop{i}");
+            FusionSounds[i] = _renderContext.Content.Load<SoundEffect>($"SFX/pop{i}");
         }
 
         DropSound = _renderContext.Content.Load<SoundEffect>("SFX/click");
@@ -137,7 +137,7 @@ public class FruitsContainer
         // load textures
         _frame = new RenderTarget2D(_renderContext.GraphicsDevice, rect.Width, rect.Height, false, SurfaceFormat.Color, DepthFormat.None, 4, RenderTargetUsage.DiscardContents);
 
-        // crate color
+        // create color
         WallGradient = new(
             new Vector2(0, 0), new Color(96, 165, 250),
             new Vector2(0, Rectangle.Bottom), new Color(160, 100, 250)
@@ -187,7 +187,7 @@ public class FruitsContainer
             BodyType.Dynamic
             );
 
-        // make the link betweetthe two
+        // make the link between the two
         newFruit.Body = fruitBody;
         fruitBody.Tag = newFruit;
 
@@ -425,7 +425,7 @@ public class FruitsContainer
             Points += (fruitA.Value + 2) * (fruitA.Value + 1) / 2;
 
             // play sound
-            FusionSonds[fruitA.Value].Play();
+            FusionSounds[fruitA.Value].Play();
 
             // Do not create a new fruit when you get to the last one
             if (fruitA.Value == MaxFruits - 1) return false;
