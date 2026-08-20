@@ -57,6 +57,12 @@ Content/              # Game assets (images, fonts, music, SFX) and MonoGame Con
 Icon/                 # Application icon
 ```
 
+## Credits
+
+- SFX — [moonfloof/suika-game](https://github.com/moonfloof/suika-game)
+- Music — [Mewmore // Castelia City (Pokémon Black & White Remix)](https://www.youtube.com/watch?v=H0dWnEu84NA)
+
+
 ## License
 
 No license specified yet.

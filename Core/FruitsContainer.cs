@@ -411,10 +411,9 @@ public class FruitsContainer
 
         if (fruitA.Value == fruitB.Value && fruitA.Deleted == false && fruitB.Deleted == false)
         {
-            Console.WriteLine(fruitA.Value);
-
+            
             fruitA.Deleted = true;
-            fruitA.Deleted = true;
+            fruitB.Deleted = true;
 
             _deleteQueue.Add(fruitA);
             _deleteQueue.Add(fruitB);
