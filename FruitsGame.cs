@@ -94,7 +94,7 @@ public class FruitsGame : Game
         BGMusic = Content.Load<Song>("SFX/bg");
         SoundEffect.MasterVolume = 1;
         MediaPlayer.IsRepeating = true;
-        MediaPlayer.Volume = 0.4f * 0;
+        MediaPlayer.Volume = 0.4f;
         MediaPlayer.Play(BGMusic);
     }
 

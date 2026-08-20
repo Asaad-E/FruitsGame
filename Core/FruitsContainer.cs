@@ -136,7 +136,7 @@ public class FruitsContainer
 
         // load textures
         _frame = new RenderTarget2D(_renderContext.GraphicsDevice, rect.Width, rect.Height, false, SurfaceFormat.Color, DepthFormat.None, 4, RenderTargetUsage.DiscardContents);
-    
+
         // crate color
         WallGradient = new(
             new Vector2(0, 0), new Color(96, 165, 250),
@@ -255,12 +255,8 @@ public class FruitsContainer
         {
             foreach (Fruit fruit in _deleteQueue)
             {
-                try
-                {
-                    Fruits.Remove(fruit);
-                    _world.Remove(fruit.Body);
-                }
-                catch { }
+                Fruits.Remove(fruit);
+                _world.Remove(fruit.Body);
             }
             _deleteQueue.Clear();
         }
@@ -328,7 +324,7 @@ public class FruitsContainer
 
         // Close batch
         _renderContext.ShapeBatch.End();
-        
+
         // Change the target to the screen
         _renderContext.GraphicsDevice.SetRenderTarget(null);
 
@@ -411,7 +407,7 @@ public class FruitsContainer
 
         if (fruitA.Value == fruitB.Value && fruitA.Deleted == false && fruitB.Deleted == false)
         {
-            
+
             fruitA.Deleted = true;
             fruitB.Deleted = true;
 
